@@ -49,4 +49,17 @@ export class AuthService {
       token: this.jwt.sign(payload),
     };
   }
+
+  async getProfile(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
 }
