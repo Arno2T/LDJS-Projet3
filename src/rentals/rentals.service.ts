@@ -50,6 +50,7 @@ export class RentalsService {
     file: Express.Multer.File,
     ownerId: number,
   ): Promise<{ message: string }> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const pictureUrl = `http://localhost:3000/uploads/${file.filename}`;
     await this.rentalsRepository.create({
       ...createRentalDto,
