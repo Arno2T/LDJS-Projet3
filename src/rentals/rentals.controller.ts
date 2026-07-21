@@ -26,7 +26,6 @@ import {
 } from './dto/rental-response.dto';
 import { CreateRentalDto } from './dto/create-rental.dto';
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 const multerStorage: StorageEngine = diskStorage({
   destination: './uploads',
   filename: (
@@ -35,11 +34,11 @@ const multerStorage: StorageEngine = diskStorage({
     cb: (error: null, filename: string) => void,
   ) => {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    cb(null, uniqueSuffix + extname(file.originalname as string));
+
+    cb(null, uniqueSuffix + extname(file.originalname));
   },
-}) as StorageEngine;
-/* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+});
+
 @ApiTags('Rentals')
 @ApiBearerAuth()
 @Controller('api/rentals')
@@ -99,7 +98,6 @@ export class RentalsController {
   })
   @UseInterceptors(
     FileInterceptor('picture', {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       storage: multerStorage,
     }),
   )
