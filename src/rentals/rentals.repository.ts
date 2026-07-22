@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateRentalDto } from './dto/create-rental.dto';
+import { UpdateRentalDto } from './dto/update-rental.dto';
 
 @Injectable()
 export class RentalsRepository {
@@ -42,6 +43,19 @@ export class RentalsRepository {
         description: data.description,
         picture: data.picture,
         ownerId: data.ownerId,
+      },
+    });
+  }
+
+  update(id: number, data: UpdateRentalDto & { picture?: string }) {
+    return this.prisma.rental.update({
+      where: { id },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.surface && { surface: data.surface }),
+        ...(data.price && { price: data.price }),
+        ...(data.description && { description: data.description }),
+        ...(data.picture && { picture: data.picture }),
       },
     });
   }

@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Param,
   Request,
   UploadedFile,
@@ -25,6 +26,7 @@ import {
   RentalResponseDto,
 } from './dto/rental-response.dto';
 import { CreateRentalDto } from './dto/create-rental.dto';
+import { UpdateRentalDto } from './dto/update-rental.dto';
 
 const multerStorage: StorageEngine = diskStorage({
   destination: './uploads',
@@ -46,7 +48,6 @@ export class RentalsController {
   constructor(private readonly rentalsService: RentalsService) {}
 
   @Get()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all rentals' })
   @ApiResponse({
     status: 200,
@@ -107,5 +108,46 @@ export class RentalsController {
     @Request() req: { user: { id: number } },
   ) {
     return this.rentalsService.create(createRentalDto, file, req.user.id);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a rental' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Appartement Paris' },
+        surface: { type: 'number', example: 50 },
+        price: { type: 'number', example: 1200 },
+        description: { type: 'string', example: 'Bel appartement' },
+        picture: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The rental has been successfully updated.',
+    type: RentalResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Rental not found.',
+  })
+  @UseInterceptors(
+    FileInterceptor('picture', {
+      storage: multerStorage,
+    }),
+  )
+  update(
+    @Param('id') id: string,
+    @Body() updateRentalDto: UpdateRentalDto,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    return this.rentalsService.update(+id, updateRentalDto, file);
   }
 }

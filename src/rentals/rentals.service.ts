@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { RentalsRepository } from './rentals.repository';
 import { RentalResponseDto } from './dto/rental-response.dto';
 import { CreateRentalDto } from './dto/create-rental.dto';
+import { UpdateRentalDto } from './dto/update-rental.dto';
 
 @Injectable()
 export class RentalsService {
@@ -50,7 +51,6 @@ export class RentalsService {
     file: Express.Multer.File,
     ownerId: number,
   ): Promise<{ message: string }> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const pictureUrl = `http://localhost:3000/uploads/${file.filename}`;
     await this.rentalsRepository.create({
       ...createRentalDto,
@@ -58,5 +58,26 @@ export class RentalsService {
       ownerId,
     });
     return { message: 'Rental created successfully !' };
+  }
+
+  async update(
+    id: number,
+    updateRentalDto: UpdateRentalDto,
+    file: Express.Multer.File | undefined,
+  ): Promise<{ message: string }> {
+    const rental = await this.rentalsRepository.findById(id);
+
+    if (!rental) {
+      throw new NotFoundException('Rental not found');
+    }
+
+    const pictureUrl = file
+      ? `http://localhost:3000/uploads/${file.filename}`
+      : undefined;
+    await this.rentalsRepository.update(id, {
+      ...updateRentalDto,
+      picture: pictureUrl,
+    });
+    return { message: 'Rental updated successfully !' };
   }
 }
